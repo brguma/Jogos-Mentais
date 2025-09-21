@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🧠 Centro de Treinamento Mental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .menu {
+            display: grid;
+            gap: 15px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover::before,
+        .game-card:active::before {
+            transform: translateX(0);
+        }
+
+        .game-card h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .game-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .game-card .score {
+            margin-top: 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .game-screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .score-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-area {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Jogo de Memória */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .memory-tile {
+            aspect-ratio: 1;
+            background: #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .memory-tile.active {
+            background: #667eea;
+            transform: scale(0.95);
+        }
+
+        .memory-tile.wrong {
+            background: #ff4444;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Jogo de Cálculo */
+        .calc-problem {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .calc-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .calc-option {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calc-option:active {
+            transform: scale(0.95);
+        }
+
+        .calc-option.correct {
+            background: #4CAF50;
+        }
+
+        .calc-option.wrong {
+            background: #ff4444;
+        }
+
+        /* Jogo de Padrões */
+        .pattern-sequence {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pattern-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+        }
+
+        .pattern-missing {
+            border: 2px dashed #667eea;
+            background: white;
+        }
+
+        /* Jogo de Foco */
+        .focus-target {
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .focus-target:active {
+            transform: scale(0.8);
+        }
+
+        .focus-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        /* Jogo de Palavras */
+        .word-display {
+            font-size: 28px;
+            letter-spacing: 5px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .word-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Timer e Progresso */
+        .timer {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Tela de Resultados */
+        .results {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .results h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .results-stats {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-again-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Estatísticas Globais */
+        .global-stats {
+            background: #f5f5f5;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .global-stats h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        /* Responsividade */
+        @media (max-width: 380px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .calc-problem {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Menu Principal -->
+        <div id="mainMenu" class="menu">
+            <h1>🧠 Treinamento Mental</h1>
+            
+            <div class="game-card" onclick="startGame('memory')">
+                <h3>🎯 Sequência Memorável</h3>
+                <p>Treine sua memória visual</p>
+                <span class="score">Recorde: <span id="memoryHighScore">0</span></span>
+            </div>
+            
+            <div class="game-card" onclick="startGame('calc')">
+                <h3>⚡ Cálculo Rápido</h3>
+                <p>Velocidade de raciocínio</p>
+                <span class="score">Recorde: <span id="calcHighScore">0</span></span>
+            </div>
+            
+            <div class="game-card" onclick="startGame('pattern')">
+                <h3>🔍 Padrões Lógicos</h3>
+                <p>Raciocínio e inteligência</p>
+                <span class="score">Recorde: <span id="patternHighScore">0</span></span>
+            </div>
+            
+            <div class="game-card" onclick="startGame('focus')">
+                <h3>🎪 Foco Total</h3>
+                <p>Concentração e reflexos</p>
+                <span class="score">Recorde: <span id="focusHighScore">0</span></span>
+            </div>
+            
+            <div class="game-card" onclick="startGame('words')">
+                <h3>📝 Palavras Embaralhadas</h3>
+                <p>Intelecto e vocabulário</p>
+                <span class="score">Recorde: <span id="wordsHighScore">0</span></span>
+            </div>
+            
+            <div class="global-stats">
+                <h3>📊 Estatísticas Globais</h3>
+                <div class="stat-item">
+                    <span>Total de Jogos:</span>
+                    <span class="stat-value" id="totalGames">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Pontuação Total:</span>
+                    <span class="stat-value" id="totalScore">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Nível Mental:</span>
+                    <span class="stat-value" id="mentalLevel">Iniciante</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Jogo -->
+        <div id="gameScreen" class="game-screen">
+            <div class="game-header">
+                <button class="back-btn" onclick="backToMenu()">← Voltar</button>
+                <div class="score-display">Pontos: <span id="currentScore">0</span></div>
+            </div>
+            
+            <div class="timer" id="timer"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            
+            <div class="game-area" id="gameArea"></div>
+        </div>
+    </div>
+
+    <script>
+        // Estado do Jogo
+        let gameState = {
+            currentGame: null,
+            score: 0,
+            level: 1,
+            timeLeft: 0,
+            maxTime: 180, // 3 minutos por jogo
+            gameData: {},
+            interval: null
+        };
+
+        // Dados salvos (simulando localStorage com objeto em memória)
+        let savedData = {
+            memoryHighScore: 0,
+            calcHighScore: 0,
+            patternHighScore: 0,
+            focusHighScore: 0,
+            wordsHighScore: 0,
+            totalGames: 0,
+            totalScore: 0
+        };
+
+        // Inicializar estatísticas
+        function initStats() {
+            updateStats();
+        }
+
+        // Atualizar estatísticas na tela
+        function updateStats() {
+            document.getElementById('memoryHighScore').textContent = savedData.memoryHighScore;
+            document.getElementById('calcHighScore').textContent = savedData.calcHighScore;
+            document.getElementById('patternHighScore').textContent = savedData.patternHighScore;
+            document.getElementById('focusHighScore').textContent = savedData.focusHighScore;
+            document.getElementById('wordsHighScore').textContent = savedData.wordsHighScore;
+            document.getElementById('totalGames').textContent = savedData.totalGames;
+            document.getElementById('totalScore').textContent = savedData.totalScore;
+            
+            // Calcular nível mental
+            let level = 'Iniciante';
+            if (savedData.totalScore > 5000) level = 'Gênio';
+            else if (savedData.totalScore > 3000) level = 'Expert';
+            else if (savedData.totalScore > 1500) level = 'Avançado';
+            else if (savedData.totalScore > 500) level = 'Intermediário';
+            
+            document.getElementById('mentalLevel').textContent = level;
+        }
+
+        // Iniciar Jogo
+        function startGame(gameType) {
+            gameState.currentGame = gameType;
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.timeLeft = gameState.maxTime;
+            
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameScreen').classList.add('active');
+            document.getElementById('currentScore').textContent = '0';
+            
+            // Iniciar timer
+            startTimer();
+            
+            // Iniciar jogo específico
+            switch(gameType) {
+                case 'memory':
+                    initMemoryGame();
+                    break;
+                case 'calc':
+                    initCalcGame();
+                    break;
+                case 'pattern':
+                    initPatternGame();
+                    break;
+                case 'focus':
+                    initFocusGame();
+                    break;
+                case 'words':
+                    initWordsGame();
+                    break;
+            }
+        }
+
+        // Timer
+        function startTimer() {
+            if (gameState.interval) clearInterval(gameState.interval);
+            
+            gameState.interval = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimer();
+                updateProgressBar();
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgressBar() {
+            const progress = ((gameState.maxTime - gameState.timeLeft) / gameState.maxTime) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Voltar ao Menu
+        function backToMenu() {
+            if (gameState.interval) clearInterval(gameState.interval);
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('mainMenu').style.display = 'grid';
+            updateStats();
+        }
+
+        // Finalizar Jogo
+        function endGame() {
+            if (gameState.interval) clearInterval(gameState.interval);
+            
+            // Atualizar recordes
+            const scoreKey = gameState.currentGame + 'HighScore';
+            if (gameState.score > savedData[scoreKey]) {
+                savedData[scoreKey] = gameState.score;
+            }
+            
+            savedData.totalGames++;
+            savedData.totalScore += gameState.score;
+            
+            // Mostrar resultados
+            showResults();
+        }
+
+        function showResults() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="results">
+                    <h2>🏆 Jogo Finalizado!</h2>
+                    <div class="results-stats">
+                        <div class="stat-row">
+                            <span>Pontuação:</span>
+                            <strong>${gameState.score}</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Nível Alcançado:</span>
+                            <strong>${gameState.level}</strong>
+                        </div>
+                        <div class="stat-row">
+                            <span>Recorde:</span>
+                            <strong>${savedData[gameState.currentGame + 'HighScore']}</strong>
+                        </div>
+                    </div>
+                    <button class="play-again-btn" onclick="startGame('${gameState.currentGame}')">
+                        Jogar Novamente
+                    </button>
+                </div>
+            `;
+        }
+
+        // Atualizar pontuação
+        function addScore(points) {
+            gameState.score += points;
+            document.getElementById('currentScore').textContent = gameState.score;
+            
+            // Aumentar nível a cada 100 pontos
+            if (gameState.score > 0 && gameState.score % 100 === 0) {
+                gameState.level++;
+            }
+        }
+
+        // JOGO 1: MEMÓRIA
+        function initMemoryGame() {
+            gameState.gameData = {
+                sequence: [],
+                playerIndex: 0,
+                showing: false
+            };
+            nextMemoryRound();
+        }
+
+        function nextMemoryRound() {
+            const gameArea = document.getElementById('gameArea');
+            gameState.gameData.sequence = [];
+            gameState.gameData.playerIndex = 0;
+            
+            // Gerar sequência
+            const sequenceLength = 3 + Math.floor(gameState.level / 2);
+            for (let i = 0; i < sequenceLength; i++) {
+                gameState.gameData.sequence.push(Math.floor(Math.random() * 9));
+            }
+            
+            // Criar grade
+            gameArea.innerHTML = `
+                <div class="memory-grid">
+                    ${[...Array(9)].map((_, i) => 
+                        `<div class="memory-tile" data-index="${i}" onclick="memoryTileClick(${i})"></div>`
+                    ).join('')}
+                </div>
+            `;
+            
+            // Mostrar sequência
+            showMemorySequence();
+        }
+
+        function showMemorySequence() {
+            gameState.gameData.showing = true;
+            const tiles = document.querySelectorAll('.memory-tile');
+            
+            gameState.gameData.sequence.forEach((index, i) => {
+                setTimeout(() => {
+                    tiles[index].classList.add('active');
+                    setTimeout(() => {
+                        tiles[index].classList.remove('active');
+                        
+                        if (i === gameState.gameData.sequence.length - 1) {
+                            setTimeout(() => {
+                                gameState.gameData.showing = false;
+                            }, 500);
+                        }
+                    }, 600);
+                }, i * 800);
+            });
+        }
+
+        function memoryTileClick(index) {
+            if (gameState.gameData.showing) return;
+            
+            const tile = document.querySelector(`.memory-tile[data-index="${index}"]`);
+            
+            if (index === gameState.gameData.sequence[gameState.gameData.playerIndex]) {
+                tile.classList.add('active');
+                setTimeout(() => tile.classList.remove('active'), 300);
+                
+                gameState.gameData.playerIndex++;
+                addScore(10);
+                
+                if (gameState.gameData.playerIndex === gameState.gameData.sequence.length) {
+                    setTimeout(nextMemoryRound, 1000);
+                }
+            } else {
+                tile.classList.add('wrong');
+                setTimeout(() => {
+                    tile.classList.remove('wrong');
+                    nextMemoryRound();
+                }, 500);
+            }
+        }
+
+        // JOGO 2: CÁLCULO RÁPIDO
+        function initCalcGame() {
+            nextCalcProblem();
+        }
+
+        function nextCalcProblem() {
+            const operations = ['+', '-', '×'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            let a, b, answer;
+            const difficulty = gameState.level;
+            
+            switch(op) {
+                case '+':
+                    a = Math.floor(Math.random() * (10 * difficulty)) + 1;
+                    b = Math.floor(Math.random() * (10 * difficulty)) + 1;
+                    answer = a + b;
+                    break;
+                case '-':
+                    a = Math.floor(Math.random() * (10 * difficulty)) + 10;
+                    b = Math.floor(Math.random() * (10 * difficulty)) + 1;
+                    answer = a - b;
+                    break;
+                case '×':
+                    a = Math.floor(Math.random() * (5 * difficulty)) + 1;
+                    b = Math.floor(Math.random() * 10) + 1;
+                    answer = a * b;
+                    break;
+            }
+            
+            // Gerar opções
+            const options = [answer];
+            while (options.length < 4) {
+                const wrong = answer + (Math.floor(Math.random() * 20) - 10);
+                if (!options.includes(wrong) && wrong > 0) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="calc-problem">${a} ${op} ${b} = ?</div>
+                <div class="calc-options">
+                    ${options.map(opt => 
+                        `<button class="calc-option" onclick="checkCalcAnswer(${opt}, ${answer})">${opt}</button>`
+                    ).join('')}
+                </div>
+            `;
+        }
+
+        function checkCalcAnswer(selected, correct) {
+            const buttons = document.querySelectorAll('.calc-option');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (parseInt(btn.textContent) === correct) {
+                    btn.classList.add('correct');
+                } else if (parseInt(btn.textContent) === selected) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            if (selected === correct) {
+                addScore(15);
+            }
+            
+            setTimeout(nextCalcProblem, 1000);
+        }
+
+        // JOGO 3: PADRÕES LÓGICOS
+        function initPatternGame() {
+            nextPattern();
+        }
+
+        function nextPattern() {
+            const patterns = [
+                { type: 'arithmetic', start: Math.floor(Math.random() * 10) + 1, step: Math.floor(Math.random() * 5) + 1 },
+                { type: 'geometric', start: Math.floor(Math.random() * 3) + 1, ratio: 2 },
+                { type: 'fibonacci' }
+            ];
+            
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            let sequence = [];
+            
+            switch(pattern.type) {
+                case 'arithmetic':
+                    for (let i = 0; i < 5; i++) {
+                        sequence.push(pattern.start + (i * pattern.step));
+                    }
+                    break;
+                case 'geometric':
+                    for (let i = 0; i < 5; i++) {
+                        sequence.push(pattern.start * Math.pow(pattern.ratio, i));
+                    }
+                    break;
+                case 'fibonacci':
+                    sequence = [1, 1, 2, 3, 5];
+                    break;
+            }
+            
+            const missingIndex = Math.floor(Math.random() * 4) + 1;
+            const answer = sequence[missingIndex];
+            const displaySeq = [...sequence];
+            displaySeq[missingIndex] = '?';
+            
+            // Gerar opções
+            const options = [answer];
+            while (options.length < 4) {
+                const wrong = answer + (Math.floor(Math.random() * 10) - 5);
+                if (!options.includes(wrong) && wrong > 0) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="pattern-sequence">
+                    ${displaySeq.map((item, i) => 
+                        `<div class="pattern-item ${item === '?' ? 'pattern-missing' : ''}">${item}</div>`
+                    ).join('')}
+                </div>
+                <div class="calc-options">
+                    ${options.map(opt => 
+                        `<button class="calc-option" onclick="checkPatternAnswer(${opt}, ${answer})">${opt}</button>`
+                    ).join('')}
+                </div>
+            `;
+        }
+
+        function checkPatternAnswer(selected, correct) {
+            const buttons = document.querySelectorAll('.calc-option');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (parseInt(btn.textContent) === correct) {
+                    btn.classList.add('correct');
+                } else if (parseInt(btn.textContent) === selected) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            if (selected === correct) {
+                addScore(20);
+            }
+            
+            setTimeout(nextPattern, 1500);
+        }
+
+        // JOGO 4: FOCO TOTAL
+        function initFocusGame() {
+            gameState.gameData = {
+                targetsHit: 0,
+                currentTarget: 1
+            };
+            spawnFocusTarget();
+        }
+
+        function spawnFocusTarget() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = '<div class="focus-container" id="focusContainer"></div>';
+            
+            const container = document.getElementById('focusContainer');
+            const target = document.createElement('div');
+            target.className = 'focus-target';
+            target.textContent = gameState.gameData.currentTarget;
+            
+            // Posição aleatória
+            const maxX = container.offsetWidth - 60;
+            const maxY = container.offsetHeight - 60;
+            target.style.left = Math.random() * maxX + 'px';
+            target.style.top = Math.random() * maxY + 'px';
+            
+            // Velocidade baseada no nível
+            const duration = Math.max(1000, 3000 - (gameState.level * 200));
+            
+            target.onclick = () => {
+                addScore(10);
+                gameState.gameData.targetsHit++;
+                gameState.gameData.currentTarget++;
+                target.remove();
+                spawnFocusTarget();
+            };
+            
+            container.appendChild(target);
+            
+            // Remover após um tempo se não for clicado
+            setTimeout(() => {
+                if (target.parentNode) {
+                    target.remove();
+                    gameState.gameData.currentTarget = 1;
+                    spawnFocusTarget();
+                }
+            }, duration);
+        }
+
+        // JOGO 5: PALAVRAS EMBARALHADAS
+        function initWordsGame() {
+            nextWord();
+        }
+
+        function nextWord() {
+            const words = [
+                // Fácil
+                'CASA', 'MESA', 'GATO', 'LIVRO', 'ÁGUA', 'FLOR', 'PORTA', 'CARRO',
+                // Médio
+                'ESCOLA', 'JANELA', 'MÚSICA', 'CIDADE', 'FAMÍLIA', 'AMIZADE',
+                // Difícil
+                'CONHECIMENTO', 'INTELIGÊNCIA', 'COMPUTADOR', 'CRIATIVIDADE'
+            ];
+            
+            // Selecionar palavra baseada no nível
+            const maxIndex = Math.min(words.length, 4 + gameState.level * 2);
+            const word = words[Math.floor(Math.random() * maxIndex)];
+            
+            // Embaralhar
+            const shuffled = word.split('').sort(() => Math.random() - 0.5).join('');
+            
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="word-display">${shuffled}</div>
+                <input type="text" class="word-input" id="wordInput" placeholder="Digite a palavra correta">
+                <button class="submit-btn" onclick="checkWord('${word}')">Verificar</button>
+            `;
+            
+            document.getElementById('wordInput').focus();
+            document.getElementById('wordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkWord(word);
+            });
+        }
+
+        function checkWord(correct) {
+            const input = document.getElementById('wordInput').value.toUpperCase();
+            
+            if (input === correct) {
+                addScore(25);
+                document.getElementById('wordInput').style.borderColor = '#4CAF50';
+            } else {
+                document.getElementById('wordInput').style.borderColor = '#ff4444';
+            }
+            
+            setTimeout(nextWord, 1000);
+        }
+
+        // Inicializar ao carregar
+        window.onload = initStats;
+    </script>
+</body>
+</html>
